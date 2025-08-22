@@ -1,0 +1,5 @@
+.env
+accounts.txt
+logs/*
+src/accounts.db
+/node_modules

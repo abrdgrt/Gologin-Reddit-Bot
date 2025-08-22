@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reddit Registration Automation</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Roboto', 'Arial', sans-serif;
+    }
+
+    body {
+      background: #eef2f7;
+      color: #2c3e50;
+      padding: 20px;
+      line-height: 1.6;
+      font-size: 16px;
+    }
+
+    header {
+      background: linear-gradient(120deg, #e74c3c, #c0392b);
+      color: white;
+      padding: 25px;
+      text-align: center;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+      margin-bottom: 30px;
+    }
+
+    header h1 {
+      font-size: 2.2em;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+
+    header p {
+      font-size: 1.1em;
+      opacity: 0.9;
+    }
+
+    .config-presets {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .config-presets button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 25px;
+      background: #ffffff;
+      color: #e74c3c;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .config-presets button:hover {
+      background: #e74c3c;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .config-presets button.active {
+      background: #e74c3c;
+      color: white;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+    }
+
+    .stages {
+      display: flex;
+      border-bottom: 1px solid #ddd;
+      background: #f9fafb;
+    }
+
+    .stage-tab {
+      flex: 1;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+      font-weight: 500;
+      color: #7f8c8d;
+      transition: all 0.3s ease;
+    }
+
+    .stage-tab.active {
+      background: white;
+      color: #e74c3c;
+      border-bottom: 3px solid #e74c3c;
+    }
+
+    .stage-tab:hover {
+      background: #f1f3f5;
+    }
+
+    .stage-content {
+      padding: 25px;
+      display: none;
+    }
+
+    .stage-content.active {
+      display: block;
+    }
+
+    .section {
+      margin-bottom: 20px;
+    }
+
+    .section h2 {
+      font-size: 1.3em;
+      color: #34495e;
+      margin-bottom: 15px;
+      padding-bottom: 5px;
+      border-bottom: 2px solid #ecf0f1;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 12px 0;
+      font-size: 0.95em;
+    }
+
+    label span {
+      min-width: 150px;
+      color: #34495e;
+      font-weight: 500;
+    }
+
+    label input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #e74c3c;
+    }
+
+    label input[type="text"],
+    label input[type="number"],
+    label select,
+    label textarea {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 0.95em;
+      transition: border-color 0.3s ease;
+    }
+
+    label input[type="text"]:focus,
+    label input[type="number"]:focus,
+    label select:focus,
+    label textarea:focus {
+      border-color: #e74c3c;
+      outline: none;
+    }
+
+    label textarea {
+      height: 100px;
+      resize: vertical;
+    }
+
+    .tooltip {
+      position: relative;
+    }
+
+    .tooltip::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      background: #2c3e50;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 0.85em;
+      white-space: nowrap;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.2s;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+    }
+
+    .tooltip:hover::after {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 15px;
+      padding: 20px;
+      border-top: 1px solid #ddd;
+      background: #f9fafb;
+    }
+
+    button[type="submit"],
+    button[type="button"] {
+      padding: 12px 25px;
+      border: none;
+      border-radius: 25px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    button[type="submit"] {
+      background: #e74c3c;
+      color: white;
+    }
+
+    button[type="submit"]:hover {
+      background: #c0392b;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    button[type="button"] {
+      background: #7f8c8d;
+      color: white;
+    }
+
+    button[type="button"]:hover {
+      background: #6c7a89;
+      transform: translateY(-2px);
+    }
+
+    #progress {
+      margin-top: 20px;
+      text-align: center;
+      color: #7f8c8d;
+      font-style: italic;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        margin: 0 10px;
+      }
+
+      header h1 {
+        font-size: 1.8em;
+      }
+
+      .stages {
+        flex-direction: column;
+      }
+
+      .stage-tab {
+        padding: 12px;
+      }
+
+      label {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      label span {
+        min-width: 0;
+        margin-bottom: 5px;
+      }
+
+      .form-actions {
+        flex-direction: column;
+      }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <h1>Reddit Registration Automation</h1>
+    <p>Configure and automate Reddit account creation with ease</p>
+    <div class="config-presets">
+      <button type="button" onclick="applyConfig('basic')" class="active">Basic</button>
+      <button type="button" onclick="applyConfig('advanced')">Advanced</button>
+      <button type="button" onclick="applyConfig('stealth')">Stealth</button>
+      <button type="button" onclick="applyConfig('custom')">Custom</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <form id="configForm">
+      <div class="stages">
+        <div class="stage-tab active" data-stage="general">General Settings</div>
+        <div class="stage-tab" data-stage="email-captcha">Email & CAPTCHA</div>
+        <div class="stage-tab" data-stage="retries">Retries & Limits</div>
+        <div class="stage-tab" data-stage="api">API Settings</div>
+        <div class="stage-tab" data-stage="behavior">Behavior</div>
+        <div class="stage-tab" data-stage="extras">Extras</div>
+      </div>
+
+      <!-- General Settings -->
+      <div class="stage-content active" data-stage="general">
+        <div class="section">
+          <h2>Browser & Proxy</h2>
+          <label class="tooltip" data-tooltip="Run browser without GUI"><input type="checkbox" name="headless"> Headless Mode</label>
+          <label class="tooltip" data-tooltip="Delay between actions (ms)"><span>Slow Motion:</span> <input type="number" name="slowMo" value="50" min="0"></label>
+          <label class="tooltip" data-tooltip="Use proxy servers"><input type="checkbox" name="useProxy"> Use Proxy</label>
+          <label class="tooltip" data-tooltip="List proxies (one per line)"><span>Proxy List:</span> <textarea name="proxyList" placeholder="http://user:pass@proxy:port"></textarea></label>
+          <label class="tooltip" data-tooltip="Randomize browser user agent"><input type="checkbox" name="rotateUserAgent" checked> Rotate User Agent</label>
+        </div>
+        <div class="section">
+          <h2>GoLogin Integration</h2>
+          <label class="tooltip" data-tooltip="Use GoLogin for fingerprinting"><input type="checkbox" name="useGoLogin" checked> Use GoLogin</label>
+          <label class="tooltip" data-tooltip="Your GoLogin API token"><span>GoLogin Token:</span> <input type="text" name="goLoginToken" placeholder="Enter token"></label>
+          <label class="tooltip" data-tooltip="Specific profile ID (optional)"><span>Profile ID:</span> <input type="text" name="goLoginProfileId" placeholder="Optional"></label>
+          <label class="tooltip" data-tooltip="Use cloud API instead of local"><input type="checkbox" name="useGoLoginApi"> Use GoLogin API</label>
+          <label class="tooltip" data-tooltip="Path to Orbita browser"><span>Executable Path:</span> <input type="text" name="goLoginExecutablePath" value="/usr/bin/orbita-browser/chrome"></label>
+          <label class="tooltip" data-tooltip="Create new profile each run"><input type="checkbox" name="createNewProfile" checked> Create New Profile</label>
+          <label class="tooltip" data-tooltip="OS for fingerprint"><span>Profile OS:</span> <select name="profileOs">
+            <option value="lin" selected>Linux</option>
+            <option value="win">Windows</option>
+            <option value="mac">macOS</option>
+          </select></label>
+        </div>
+      </div>
+
+      <!-- Email & CAPTCHA -->
+      <div class="stage-content" data-stage="email-captcha">
+        <div class="section">
+          <h2>Email Settings</h2>
+          <label class="tooltip" data-tooltip="Method to provide email"><span>Email Mode:</span>
+            <select name="emailMode">
+              <option value="api" selected>API</option>
+              <option value="manual">Manual</option>
+            </select>
+          </label>
+          <label class="tooltip" data-tooltip="Temporary email service"><span>Email Provider:</span> <input type="text" name="emailProvider" value="temp-mail"></label>
+        </div>
+        <div class="section">
+          <h2>CAPTCHA Settings</h2>
+          <label class="tooltip" data-tooltip="Method to solve CAPTCHAs"><span>CAPTCHA Mode:</span>
+            <select name="captchaMode">
+              <option value="auto" selected>Auto (2Captcha)</option>
+              <option value="manual">Manual</option>
+            </select>
+          </label>
+          <label class="tooltip" data-tooltip="Your 2Captcha API key"><span>2Captcha Key:</span> <input type="text" name="twoCaptchaKey" placeholder="Enter key"></label>
+        </div>
+      </div>
+
+      <!-- Retries & Rate Limiting -->
+      <div class="stage-content" data-stage="retries">
+        <div class="section">
+          <h2>Retry Settings</h2>
+          <label class="tooltip" data-tooltip="Retry failed attempts"><input type="checkbox" name="retriesEnabled" checked> Enable Retries</label>
+          <label class="tooltip" data-tooltip="Maximum retry attempts"><span>Max Retries:</span> <input type="number" name="maxRetries" value="3" min="1"></label>
+          <label class="tooltip" data-tooltip="Increase delay between retries"><input type="checkbox" name="useExponentialBackoff" checked> Exponential Backoff</label>
+          <label class="tooltip" data-tooltip="Switch proxy on failure"><input type="checkbox" name="switchProxyOnFail" checked> Switch Proxy on Fail</label>
+        </div>
+        <div class="section">
+          <h2>Rate Limiting</h2>
+          <label class="tooltip" data-tooltip="Limit requests per IP"><input type="checkbox" name="rateLimitEnabled"> Enable Rate Limiting</label>
+          <label class="tooltip" data-tooltip="Max requests per IP"><span>Rate Limit per IP:</span> <input type="number" name="rateLimitPerIP" value="5" min="1"></label>
+          <label class="tooltip" data-tooltip="Time window (ms)"><span>Rate Limit Window:</span> <input type="number" name="rateLimitWindow" value="3600000" min="1000"></label>
+        </div>
+      </div>
+
+      <!-- API Settings -->
+      <div class="stage-content" data-stage="api">
+        <div class="section">
+          <h2>Content & LLM</h2>
+          <label class="tooltip" data-tooltip="Use Gemini for dynamic selectors"><input type="checkbox" name="useContentApi" checked> Use Content API</label>
+          <label class="tooltip" data-tooltip="Track actions for context"><input type="checkbox" name="tellStory" checked> Tell Story</label>
+          <label class="tooltip" data-tooltip="Save learned selectors to file"><input type="checkbox" name="saveLearnedSelectors" checked> Save Learned Selectors</label>
+          <label class="tooltip" data-tooltip="Method to select elements"><span>Registration Mode:</span>
+            <select name="registrationMode">
+              <option value="manual">Manual</option>
+              <option value="api" selected>API</option>
+              <option value="hybrid">Hybrid</option>
+            </select>
+          </label>
+          <label class="tooltip" data-tooltip="Your Gemini API key"><span>Gemini API Key:</span> <input type="text" name="geminiApiKey" placeholder="Enter key"></label>
+        </div>
+        <div class="section">
+          <h2>Manual Selectors</h2>
+          <label class="tooltip" data-tooltip="CSS selector for username"><span>Username:</span> <input type="text" name="manualSelectors.username" value="#regUsername"></label>
+          <label class="tooltip" data-tooltip="CSS selector for password"><span>Password:</span> <input type="text" name="manualSelectors.password" value="#regPassword"></label>
+          <label class="tooltip" data-tooltip="CSS selector for email"><span>Email:</span> <input type="text" name="manualSelectors.email" value="#regEmail"></label>
+          <label class="tooltip" data-tooltip="CSS selector for submit"><span>Submit:</span> <input type="text" name="manualSelectors.submit" value="#registerButton"></label>
+        </div>
+      </div>
+
+      <!-- Human-Like Behavior -->
+      <div class="stage-content" data-stage="behavior">
+        <div class="section">
+          <h2>Movement & Timing</h2>
+          <label class="tooltip" data-tooltip="Simulate human mouse movements"><input type="checkbox" name="mouseMovements" checked> Mouse Movements</label>
+          <label class="tooltip" data-tooltip="Scale of mouse noise"><span>Noise Scale:</span> <input type="number" name="noiseScale" value="20" min="1"></label>
+          <label class="tooltip" data-tooltip="Add random delays"><input type="checkbox" name="randomDelays" checked> Random Delays</label>
+          <label class="tooltip" data-tooltip="Hover before clicking"><input type="checkbox" name="hoverBeforeClick" checked> Hover Before Click</label>
+          <label class="tooltip" data-tooltip="Simulated reading time (ms)"><span>Reading Time:</span> <input type="number" name="readingTime" value="2000" min="0"></label>
+          <label class="tooltip" data-tooltip="Use three-dot menu"><input type="checkbox" name="useThreeDotMenu"> Use Three-Dot Menu</label>
+        </div>
+      </div>
+
+      <!-- Extras -->
+      <div class="stage-content" data-stage="extras">
+        <div class="section">
+          <h2>Additional Features</h2>
+          <label class="tooltip" data-tooltip="Send errors to Sentry"><input type="checkbox" name="useSentry"> Use Sentry</label>
+          <label class="tooltip" data-tooltip="Sentry DSN"><span>Sentry DSN:</span> <input type="text" name="sentryDsn" placeholder="Enter DSN"></label>
+          <label class="tooltip" data-tooltip="Perform warm-up actions"><input type="checkbox" name="warmUpEnabled"> Warm Up Account</label>
+          <label class="tooltip" data-tooltip="Warm-up duration (ms)"><span>Warm Up Duration:</span> <input type="number" name="warmUpDuration" value="120000" min="1000"></label>
+          <label class="tooltip" data-tooltip="Save screenshots on failure"><input type="checkbox" name="screenshotOnFail" checked> Screenshot on Fail</label>
+          <label class="tooltip" data-tooltip="Log directory"><span>Log Directory:</span> <input type="text" name="logDir" value="./logs"></label>
+          <label class="tooltip" data-tooltip="Username prefix"><span>Username Prefix:</span> <input type="text" name="usernamePrefix" value="Bot_"></label>
+          <label class="tooltip" data-tooltip="Use complex passwords"><input type="checkbox" name="useComplexPassword" checked> Use Complex Password</label>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit">Start Registration</button>
+        <button type="button" onclick="resetForm()">Reset Form</button>
+      </div>
+    </form>
+    <div id="progress">Status: Ready</div>
+  </div>
+
+  <script>
+    // Stage navigation
+    document.querySelectorAll('.stage-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.stage-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.stage-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelector(`.stage-content[data-stage="${tab.dataset.stage}"]`).classList.add('active');
+      });
+    });
+
+    // Form submission
+    document.getElementById('configForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const config = {
+        headless: formData.get('headless') === 'on',
+        slowMo: parseInt(formData.get('slowMo')),
+        useProxy: formData.get('useProxy') === 'on',
+        proxyList: formData.get('proxyList'),
+        rotateUserAgent: formData.get('rotateUserAgent') === 'on',
+        randomDelays: formData.get('randomDelays') === 'on',
+        mouseMovements: formData.get('mouseMovements') === 'on',
+        pageLoadRetries: formData.get('pageLoadRetries') === 'on',
+        usernamePrefix: formData.get('usernamePrefix'),
+        useComplexPassword: formData.get('useComplexPassword') === 'on',
+        captchaMode: formData.get('captchaMode'),
+        emailMode: formData.get('emailMode'),
+        emailProvider: formData.get('emailProvider'),
+        retriesEnabled: formData.get('retriesEnabled') === 'on',
+        maxRetries: parseInt(formData.get('maxRetries')),
+        useExponentialBackoff: formData.get('useExponentialBackoff') === 'on',
+        switchProxyOnFail: formData.get('switchProxyOnFail') === 'on',
+        rateLimitEnabled: formData.get('rateLimitEnabled') === 'on',
+        rateLimitPerIP: parseInt(formData.get('rateLimitPerIP')),
+        rateLimitWindow: parseInt(formData.get('rateLimitWindow')),
+        useContentApi: formData.get('useContentApi') === 'on',
+        registrationMode: formData.get('registrationMode'),
+        tellStory: formData.get('tellStory') === 'on',
+        saveLearnedSelectors: formData.get('saveLearnedSelectors') === 'on',
+        useGoLogin: formData.get('useGoLogin') === 'on',
+        goLoginToken: formData.get('goLoginToken'),
+        goLoginProfileId: formData.get('goLoginProfileId'),
+        useGoLoginApi: formData.get('useGoLoginApi') === 'on',
+        goLoginExecutablePath: formData.get('goLoginExecutablePath'),
+        createNewProfile: formData.get('createNewProfile') === 'on',
+        profileOs: formData.get('profileOs'),
+        useThreeDotMenu: formData.get('useThreeDotMenu') === 'on',
+        hoverBeforeClick: formData.get('hoverBeforeClick') === 'on',
+        readingTime: parseInt(formData.get('readingTime')),
+        noiseScale: parseInt(formData.get('noiseScale')),
+        useSentry: formData.get('useSentry') === 'on',
+        sentryDsn: formData.get('sentryDsn'),
+        warmUpEnabled: formData.get('warmUpEnabled') === 'on',
+        warmUpDuration: parseInt(formData.get('warmUpDuration')),
+        screenshotOnFail: formData.get('screenshotOnFail') === 'on',
+        logDir: formData.get('logDir'),
+        geminiApiKey: formData.get('geminiApiKey'),
+        twoCaptchaKey: formData.get('twoCaptchaKey'),
+        manualSelectors: {
+          username: formData.get('manualSelectors.username'),
+          password: formData.get('manualSelectors.password'),
+          email: formData.get('manualSelectors.email'),
+          submit: formData.get('manualSelectors.submit')
+        }
+      };
+
+      document.getElementById('progress').textContent = 'Status: Starting registration...';
+      try {
+        const response = await fetch('/start', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(config)
+        });
+        if (response.ok) {
+          document.getElementById('progress').textContent = 'Status: Registration started!';
+          alert('Registration started successfully!');
+        } else {
+          throw new Error('Server error');
+        }
+      } catch (error) {
+        document.getElementById('progress').textContent = `Status: Failed - ${error.message}`;
+        alert('Failed to start registration: ' + error.message);
+      }
+    });
+
+    // Reset form
+    function resetForm() {
+      document.getElementById('configForm').reset();
+      applyConfig('basic');
+      document.getElementById('progress').textContent = 'Status: Form reset';
+    }
+
+    // Predefined configuration levels
+    function applyConfig(level) {
+      const form = document.getElementById('configForm');
+      const defaults = {
+        headless: false,
+        slowMo: 50,
+        useProxy: false,
+        proxyList: '',
+        rotateUserAgent: true,
+        randomDelays: true,
+        mouseMovements: true,
+        pageLoadRetries: true,
+        usernamePrefix: 'Bot_',
+        useComplexPassword: true,
+        captchaMode: 'auto',
+        emailMode: 'api',
+        emailProvider: 'temp-mail',
+        retriesEnabled: true,
+        maxRetries: 3,
+        useExponentialBackoff: true,
+        switchProxyOnFail: true,
+        rateLimitEnabled: false,
+        rateLimitPerIP: 5,
+        rateLimitWindow: 3600000,
+        useContentApi: true,
+        registrationMode: 'api',
+        tellStory: true,
+        saveLearnedSelectors: true,
+        useGoLogin: true,
+        goLoginToken: '',
+        goLoginProfileId: '',
+        useGoLoginApi: false,
+        goLoginExecutablePath: '/usr/bin/orbita-browser/chrome',
+        createNewProfile: true,
+        profileOs: 'lin',
+        useThreeDotMenu: false,
+        hoverBeforeClick: true,
+        readingTime: 2000,
+        noiseScale: 20,
+        useSentry: false,
+        sentryDsn: '',
+        warmUpEnabled: false,
+        warmUpDuration: 120000,
+        screenshotOnFail: true,
+        logDir: './logs',
+        geminiApiKey: '',
+        twoCaptchaKey: '',
+        manualSelectors: {
+          username: '#regUsername',
+          password: '#regPassword',
+          email: '#regEmail',
+          submit: '#registerButton'
+        }
+      };
+
+      let config;
+      switch (level) {
+        case 'basic':
+          config = {
+            ...defaults,
+            useGoLogin: false,
+            mouseMovements: false,
+            randomDelays: false,
+            hoverBeforeClick: false,
+            readingTime: 0,
+            retriesEnabled: false,
+            useContentApi: false,
+            registrationMode: 'manual',
+            tellStory: false,
+            saveLearnedSelectors: false
+          };
+          break;
+        case 'advanced':
+          config = {
+            ...defaults,
+            useProxy: true,
+            proxyList: 'http://user:pass@proxy1:port\nhttp://user:pass@proxy2:port',
+            retriesEnabled: true,
+            maxRetries: 3,
+            useExponentialBackoff: true,
+            switchProxyOnFail: true,
+            rateLimitEnabled: true,
+            useContentApi: false,
+            registrationMode: 'manual',
+            tellStory: false,
+            saveLearnedSelectors: false
+          };
+          break;
+        case 'stealth':
+          config = {
+            ...defaults,
+            useGoLogin: true,
+            mouseMovements: true,
+            randomDelays: true,
+            hoverBeforeClick: true,
+            readingTime: 3000,
+            noiseScale: 30,
+            useThreeDotMenu: true,
+            warmUpEnabled: true,
+            useContentApi: true,
+            registrationMode: 'api',
+            tellStory: true,
+            saveLearnedSelectors: true
+          };
+          break;
+        case 'custom':
+          config = defaults;
+          break;
+        default:
+          config = defaults;
+      }
+
+      // Update preset button states
+      document.querySelectorAll('.config-presets button').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.textContent.toLowerCase() === level) btn.classList.add('active');
+      });
+
+      // Apply config to form
+      Object.entries(config).forEach(([key, value]) => {
+        const input = form.querySelector(`[name="${key}"]`);
+        if (!input) return;
+        if (input.type === 'checkbox') {
+          input.checked = value;
+        } else if (key === 'manualSelectors') {
+          Object.entries(value).forEach(([subKey, subValue]) => {
+            form.querySelector(`[name="manualSelectors.${subKey}"]`).value = subValue;
+          });
+        } else {
+          input.value = value;
+        }
+      });
+    }
+
+    // Initialize with basic config
+    applyConfig('basic');
+  </script>
+</body>
+</html>

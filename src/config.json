@@ -1,0 +1,46 @@
+[{
+    headless: false,
+    slowMo: 50,
+    useProxy: false,
+    proxyList: [],
+    rotateUserAgent: true,
+    randomDelays: true,
+    mouseMovements: true,
+    pageLoadRetries: true,
+    usernamePrefix: 'Bot_',
+    useComplexPassword: true,
+    captchaMode: 'auto',
+    emailMode: 'api',
+    emailProvider: 'temp-mail',
+    retriesEnabled: true,
+    maxRetries: 3,
+    useExponentialBackoff: true,
+    switchProxyOnFail: true,
+    useSentry: false,
+    warmUpEnabled: false,
+    warmUpDuration: 120000,
+    rateLimitEnabled: false,
+    rateLimitPerIP: 5,
+    rateLimitWindow: 3600000, // 1 hour
+    useContentApi: false,
+    registrationMode: 'manual', // 'manual', 'api', 'hybrid'
+    manualSelectors: {
+      username: '#regUsername',
+      password: '#regPassword',
+      email: '#regEmail',
+      submit: '#registerButton'
+    },
+    tellStory: false,
+    llmApiEndpoint: 'https://api.xai.com/v1/llm',
+    llmApiKey: process.env.LLM_API_KEY ?? '',
+    useGoLogin: true,
+    goLoginToken: process.env.GOLOGIN_TOKEN,
+    goLoginProfileId: process.env.GOLOGIN_PROFILE,
+    useGoLoginApi: true, // New toggle: false = local, true = API
+    useThreeDotMenu: false,
+    hoverBeforeClick: true,
+    readingTime: 2000,
+    screenshotOnFail: true,
+    logDir: './logs',
+    noiseScale: 20
+  }]

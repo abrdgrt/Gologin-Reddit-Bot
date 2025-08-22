@@ -1,0 +1,20 @@
+{
+  "dependencies": {
+    "@cemalgnlts/mailjs": "^3.0.1",
+    "@faker-js/faker": "^9.6.0",
+    "@google/generative-ai": "^0.24.0",
+    "@sentry/node": "^9.9.0",
+    "axios": "^1.8.4",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "gologin": "^2.1.15",
+    "puppeteer": "^24.4.0",
+    "puppeteer-core": "^24.4.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-recaptcha": "^3.6.8",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "simplex-noise": "^4.0.3",
+    "sqlite3": "^5.1.7",
+    "ws": "^8.18.1"
+  }
+}
